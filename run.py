@@ -22,6 +22,8 @@ looping = True
 
 bot = commands.Bot(command_prefix='!')
 
+bot.remove_command('help')
+
 client = MongoClient(MONGO_URL)
 db = client.AuctionDB
 mongo_auctions = db.auctions
@@ -126,7 +128,7 @@ async def on_ready():
     global ready
     ready = True
 
-@bot.command(name='create', help='This command is used to create a new auction.\n\nNOTE:\n1. All arguments are required, execpt for image-url\n2. Dates are expected in the UTC timezone\n3. Please make sure to include the "T" between the date and time\n4. To delete an auction you can just delete the channel', usage='<name> <price> <increment> <start(yyyy-MM-ddTHH:mm:ss)> <end(yyyy-MM-ddTHH:mm:ss)> <image-url>')
+@bot.command(name='create')
 async def create(ctx, name, price: int, increment: int, start, end, url='none'):
     global looping 
 
@@ -201,7 +203,7 @@ async def create(ctx, name, price: int, increment: int, start, end, url='none'):
     else: 
         pass
 
-@bot.command(name='bid', help='Creates a bid', usage='<price>')
+@bot.command(name='bid')
 async def bid(ctx, price: int):
 
     now = datetime.now()
@@ -270,7 +272,7 @@ async def bid(ctx, price: int):
     else:
         pass
 
-@bot.command(name='end', help='Ends an open auction', usage='<auctionID> \n\nNOTE:\nTo end an auction you need to reference it by the ID of the channel it is in. Enable Discord developer mode(Settings > Advanced > Developer Mode), right click on the auction channel and click "Copy ID" at the bottom to get the ID.')
+@bot.command(name='end')
 async def end(ctx, a_id):
     if (str(ctx.channel.id) == COMMAND_CHANNEL):
         if a_id in auctions_list and a_id in auctions:
@@ -290,6 +292,19 @@ async def bid_error(ctx, error):
     
         await ctx.message.reply(message, delete_after=5)
         await ctx.message.delete(delay=5)
+
+@bot.command(name='help')
+async def help(ctx, command=None):
+    if str(ctx.channel.id) == COMMAND_CHANNEL:
+        if command is None:
+            await reply_error(ctx, "```Help:\n\ncreate: Creates a new auction.\nend:    Ends an open auction\nhelp:   Shows this message\n\nType '!help command' for more info on a command.```")
+        elif command == "create":
+            await reply_error(ctx, "```Creates a new auction.\n\nUsage: !create <name> <price> <increment> <startDate(format: yyyy-MM-ddTHH:mm:ss)> <endDate(format: yyyy-MM-ddTHH:mm:ss)> <image-url>\n\nNOTE:\n1. All parameters are required, execpt for image-url\n2. Dates are expected in the UTC timezone\n3. Please make sure to include the 'T' between the date and time\n4. To delete an auction you can just delete the channel```")
+        elif command is "end":
+            await reply_error(ctx, "```Ends an open auction\n\nUsage: !end <channelID>\n\nNOTE:\nTo end an auction you need to reference it by the ID of the channel it is in. Enable Discord developer mode(User Settings > Advanced > Developer Mode), right click on the auction channel and click 'Copy ID' at the bottom to get the ID.)```")
+        else:
+            await reply_error(ctx, "```Can't help you with that command```")
+        
 
 if __name__ == "__main__":
     get_auc_history()
