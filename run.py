@@ -23,7 +23,7 @@ looping = True
 bot = commands.Bot(command_prefix='!')
 
 client = MongoClient(MONGO_URL)
-db = client.bensdb
+db = client.AuctionDB
 mongo_auctions = db.auctions
 
 def save_auc_history():
