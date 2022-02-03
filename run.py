@@ -283,6 +283,8 @@ async def end(ctx, a_id):
 @bot.command(name='price')
 async def price(ctx):
 
+    a_id = ctx.channel.id
+
     if str(a_id) in auctions_list:
 
         a = auctions[str(a_id)]
@@ -292,7 +294,7 @@ async def price(ctx):
 
         price_embed=discord.Embed(title="Auction status:", description="Current bid is " + str(price) + "ADA by " + highBidder, color=0x00a113)
         price_embed.add_field(name=chr(173), value="How to participate: !bid " + str(price+a['increment']), inline=False)
-        
+
         await ctx.send(embed=price_embed)
 
 @bid.error
